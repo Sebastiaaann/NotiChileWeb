@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
+import { AppLayout } from "@/shared/components/AppLayout";
+import { AuthGuard, ReverseAuthGuard } from "@/shared/components/AuthGuard";
 
 const FeedPage = lazy(() => import("@/features/feed"));
 const AuthPage = lazy(() => import("@/features/auth"));
@@ -23,11 +25,25 @@ export default function App() {
   return (
     <Suspense fallback={<PageSkeleton />}>
       <Routes>
-        <Route path="/" element={<FeedPage />} />
-        <Route path="/licitacion/:id" element={<DetailPage />} />
-        <Route path="/login" element={<AuthPage />} />
-        <Route path="/register" element={<AuthPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+        {/* Auth routes — reverse guard (redirect if logged in) */}
+        <Route element={<ReverseAuthGuard />}>
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/register" element={<AuthPage />} />
+        </Route>
+
+        {/* Protected routes */}
+        <Route element={<AuthGuard />}>
+          <Route element={<AppLayout />}>
+            <Route path="/settings" element={<SettingsPage />} />
+          </Route>
+        </Route>
+
+        {/* Public routes */}
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<FeedPage />} />
+          <Route path="/licitacion/:id" element={<DetailPage />} />
+        </Route>
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>
