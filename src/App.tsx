@@ -25,26 +25,23 @@ export default function App() {
   return (
     <Suspense fallback={<PageSkeleton />}>
       <Routes>
-        {/* Auth routes — reverse guard (redirect if logged in) */}
+        {/* Auth routes — si ya está logueado, redirige al feed */}
         <Route element={<ReverseAuthGuard />}>
           <Route path="/login" element={<AuthPage />} />
           <Route path="/register" element={<AuthPage />} />
         </Route>
 
-        {/* Protected routes */}
+        {/* Rutas protegidas — requieren sesión */}
         <Route element={<AuthGuard />}>
           <Route element={<AppLayout />}>
+            <Route path="/" element={<FeedPage />} />
+            <Route path="/licitacion/:id" element={<DetailPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
         </Route>
 
-        {/* Public routes */}
-        <Route element={<AppLayout />}>
-          <Route path="/" element={<FeedPage />} />
-          <Route path="/licitacion/:id" element={<DetailPage />} />
-        </Route>
-
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Default: redirige al login */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Suspense>
   );

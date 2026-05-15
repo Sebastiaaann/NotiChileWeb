@@ -12,7 +12,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { loginSchema, type LoginFormValues } from "../login-schema";
+import { GoogleButton } from "./GoogleButton";
 
 interface LoginFormProps {
   onSubmit: (data: LoginFormValues) => void;
@@ -68,6 +70,15 @@ export function LoginForm({ onSubmit, isPending, error }: LoginFormProps) {
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? "Ingresando..." : "Ingresar"}
           </Button>
+          <div className="relative w-full">
+            <div className="absolute inset-0 flex items-center">
+              <Separator className="w-full" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">O</span>
+            </div>
+          </div>
+          <GoogleButton />
           <p className="text-sm text-muted-foreground">
             ¿No tenés cuenta?{" "}
             <Link to="/register" className="text-primary hover:underline">

@@ -1,7 +1,8 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/shared/lib";
 import { Button } from "@/components/ui/button";
 import { useSidebarStore } from "@/application/stores/sidebar-store";
+import { useAuthStore } from "@/application/stores/auth-store";
 import {
   Sheet,
   SheetContent,
@@ -10,20 +11,26 @@ import {
 import {
   LayoutDashboard,
   Settings,
-  LogIn,
   Menu,
   ChevronLeft,
+  LogOut,
 } from "lucide-react";
 
 const navItems = [
   { to: "/", label: "Licitaciones", icon: LayoutDashboard },
-  { to: "/login", label: "Ingresar", icon: LogIn },
   { to: "/settings", label: "Configuración", icon: Settings },
 ];
 
 export function AppSidebar() {
   const { isCollapsed, toggle } = useSidebarStore();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated, user, clearSession } = useAuthStore();
+
+  const handleLogout = () => {
+    clearSession();
+    navigate("/login");
+  };
 
   return (
     <>
@@ -33,7 +40,12 @@ export function AppSidebar() {
           <Menu className="h-5 w-5" />
         </SheetTrigger>
         <SheetContent side="left" className="w-64 p-0">
-          <SidebarContent currentPath={location.pathname} />
+          <MobileSidebarContent
+            currentPath={location.pathname}
+            isAuthenticated={isAuthenticated}
+            user={user}
+            onLogout={handleLogout}
+          />
         </SheetContent>
       </Sheet>
 
@@ -67,12 +79,53 @@ export function AppSidebar() {
             </Link>
           ))}
         </nav>
+
+        {/* Cerrar sesión al fondo */}
+        {isAuthenticated && !isCollapsed && (
+          <div className="border-t p-4">
+            <p className="text-xs text-muted-foreground mb-2 truncate">
+              {user?.email}
+            </p>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-muted-foreground hover:text-destructive"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Cerrar sesión
+            </Button>
+          </div>
+        )}
+        {isAuthenticated && isCollapsed && (
+          <div className="border-t p-2 flex justify-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-destructive"
+              onClick={handleLogout}
+              title="Cerrar sesión"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </aside>
     </>
   );
 }
 
-function SidebarContent({ currentPath }: { currentPath: string }) {
+function MobileSidebarContent({
+  currentPath,
+  isAuthenticated,
+  user,
+  onLogout,
+}: {
+  currentPath: string;
+  isAuthenticated: boolean;
+  user: { email?: string | null; nombre?: string | null } | null;
+  onLogout: () => void;
+}) {
   return (
     <nav className="space-y-1 p-4">
       {navItems.map((item) => (
@@ -90,6 +143,20 @@ function SidebarContent({ currentPath }: { currentPath: string }) {
           <span>{item.label}</span>
         </Link>
       ))}
+      {isAuthenticated && (
+        <>
+          <div className="border-t pt-4 mt-4">
+            <p className="text-xs text-muted-foreground mb-2">{user?.email}</p>
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-destructive w-full"
+            >
+              <LogOut className="h-5 w-5" />
+              <span>Cerrar sesión</span>
+            </button>
+          </div>
+        </>
+      )}
     </nav>
   );
 }

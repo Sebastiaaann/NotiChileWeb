@@ -30,6 +30,7 @@ export async function httpClient<T>(
       "Content-Type": "application/json",
       ...headers,
     },
+    credentials: "include", // envía cookies httpOnly automáticamente
     body: body ? JSON.stringify(body) : undefined,
     signal,
   });

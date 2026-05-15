@@ -11,7 +11,7 @@ export function useSession() {
     queryFn: async () => {
       const u = await authRepo.getSession();
       if (u) {
-        setSession(u, "");
+        setSession(u);
       } else {
         clearSession();
       }
@@ -30,7 +30,7 @@ export function useLogin() {
   return useMutation({
     mutationFn: (data: LoginRequest) => authRepo.login(data),
     onSuccess: (res) => {
-      setSession(res.user, res.token);
+      setSession(res.user);
     },
   });
 }
@@ -41,7 +41,7 @@ export function useRegister() {
   return useMutation({
     mutationFn: (data: RegisterRequest) => authRepo.register(data),
     onSuccess: (res) => {
-      setSession(res.user, res.token);
+      setSession(res.user);
     },
   });
 }

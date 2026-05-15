@@ -3,20 +3,18 @@ import type { User } from "@/core/entities";
 
 interface AuthState {
   user: User | null;
-  token: string | null;
   isAuthenticated: boolean;
-  setSession: (user: User, token: string) => void;
+  setSession: (user: User) => void;
   clearSession: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  token: null,
   isAuthenticated: false,
 
-  setSession: (user, token) =>
-    set({ user, token, isAuthenticated: true }),
+  setSession: (user) =>
+    set({ user, isAuthenticated: true }),
 
   clearSession: () =>
-    set({ user: null, token: null, isAuthenticated: false }),
+    set({ user: null, isAuthenticated: false }),
 }));

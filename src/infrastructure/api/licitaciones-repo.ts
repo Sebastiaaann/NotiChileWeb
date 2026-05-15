@@ -2,7 +2,12 @@ import type { ILicitacionesRepo } from "@/core/repositories/ILicitacionesRepo";
 import type { PaginatedResponse } from "@/core/entities/ApiResponse";
 import type { Licitacion } from "@/core/entities";
 import { httpClient } from "./http-client";
-import { adaptPaginatedFeed, adaptLicitacion } from "./adapters/licitacion-adapter";
+import {
+  adaptPaginatedFeed,
+  adaptLicitacion,
+  type ApiFeedResponse,
+  type LicitacionDTO,
+} from "./adapters/licitacion-adapter";
 
 function buildQuery(params: Record<string, string | number | null | undefined>): string {
   const search = new URLSearchParams();
@@ -27,17 +32,12 @@ export const licitacionesRepo: ILicitacionesRepo = {
       monto_max: filters.montoMax,
     });
 
-    const dto = await httpClient<{
-      items: unknown[];
-      nextCursor: string | null;
-      total: number;
-    }>(`/api/licitaciones?${qs}`);
-
-    return adaptPaginatedFeed(dto as Parameters<typeof adaptPaginatedFeed>[0]);
+    const dto = await httpClient<ApiFeedResponse>(`/api/licitaciones?${qs}`);
+    return adaptPaginatedFeed(dto);
   },
 
   async getById(id: string): Promise<Licitacion> {
-    const dto = await httpClient<Record<string, unknown>>(`/api/licitaciones/${id}`);
-    return adaptLicitacion(dto as unknown as Parameters<typeof adaptLicitacion>[0]);
+    const dto = await httpClient<LicitacionDTO>(`/api/licitaciones/${id}`);
+    return adaptLicitacion(dto);
   },
 };

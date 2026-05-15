@@ -2,56 +2,60 @@ import type { Licitacion } from "@/core/entities";
 
 export interface LicitacionDTO {
   id: string;
-  codigo: string;
+  codigoExterno: string;
   nombre: string;
-  descripcion: string | null;
-  organismo_comprador: string;
-  rubro: string | null;
+  organismoNombre: string;
   tipo: string | null;
-  region: string | null;
-  estado: string;
+  categoria: string | null;
+  montoEstimado: number | null;
+  montoLabel: string;
   moneda: string;
-  monto_estimado: number | null;
-  monto_label: string;
-  fecha_publicacion: string;
-  fecha_cierre: string | null;
-  url_ficha: string;
-  created_at: string;
-  notificada: boolean;
+  fechaPublicacion: string;
+  fechaCierre: string | null;
+  estado: string;
+  url: string;
+  region: string | null;
+  createdAt: string;
 }
 
 export function adaptLicitacion(dto: LicitacionDTO): Licitacion {
   return {
     id: dto.id,
-    codigo: dto.codigo,
+    codigo: dto.codigoExterno,
     nombre: dto.nombre,
-    descripcion: dto.descripcion,
-    organismo: dto.organismo_comprador,
-    rubro: dto.rubro,
+    descripcion: null,
+    organismo: dto.organismoNombre,
+    rubro: dto.categoria,
     tipo: dto.tipo,
     region: dto.region,
     estado: dto.estado,
     moneda: dto.moneda,
-    montoEstimado: dto.monto_estimado,
-    montoLabel: dto.monto_label,
-    fechaPublicacion: dto.fecha_publicacion,
-    fechaCierre: dto.fecha_cierre,
-    urlFicha: dto.url_ficha,
-    createdAt: dto.created_at,
-    notificada: dto.notificada,
+    montoEstimado: dto.montoEstimado,
+    montoLabel: dto.montoLabel,
+    fechaPublicacion: dto.fechaPublicacion,
+    fechaCierre: dto.fechaCierre,
+    urlFicha: dto.url,
+    createdAt: dto.createdAt,
+    notificada: false,
   };
 }
 
-export interface PaginatedDTO {
-  items: LicitacionDTO[];
-  nextCursor: string | null;
-  total: number;
+export interface ApiFeedResponse {
+  data: LicitacionDTO[];
+  pageInfo: {
+    limit: number;
+    hasMore: boolean;
+    nextCursor: string | null;
+    sortMode: string;
+    windowDays: number;
+    windowStart: string;
+  };
 }
 
-export function adaptPaginatedFeed(dto: PaginatedDTO) {
+export function adaptPaginatedFeed(dto: ApiFeedResponse) {
   return {
-    items: dto.items.map(adaptLicitacion),
-    nextCursor: dto.nextCursor,
-    total: dto.total,
+    items: dto.data.map(adaptLicitacion),
+    nextCursor: dto.pageInfo.nextCursor,
+    total: dto.pageInfo.limit,
   };
 }
